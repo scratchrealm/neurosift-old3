@@ -19,7 +19,12 @@ import setProjectFileHandler from '../apiHelpers/NeurosiftRequestHandlers/setPro
 import setProjectPropertyHandler from '../apiHelpers/NeurosiftRequestHandlers/setProjectPropertyHandler'
 import setWorkspacePropertyHandler from '../apiHelpers/NeurosiftRequestHandlers/setWorkspacePropertyHandler'
 import setWorkspaceUsersHandler from '../apiHelpers/NeurosiftRequestHandlers/setWorkspaceUsersHandler'
-import { isCloneProjectRequest, isCreateProjectRequest, isCreateWorkspaceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteWorkspaceRequest, isDuplicateProjectFileRequest, isGetDataBlobRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetProjectsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isNeurosiftRequest, isRenameProjectFileRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/NeurosiftRequest'
+import getProjectResourcesHandler from '../apiHelpers/NeurosiftRequestHandlers/getProjectResourcesHandler'
+import getProjectResourceHandler from '../apiHelpers/NeurosiftRequestHandlers/getProjectResourceHandler'
+import addProjectResourceHandler from '../apiHelpers/NeurosiftRequestHandlers/addProjectResourceHandler'
+import deleteProjectResourceHandler from '../apiHelpers/NeurosiftRequestHandlers/deleteProjectResourceHandler'
+import renameProjectResourceHandler from '../apiHelpers/NeurosiftRequestHandlers/renameProjectResourceHandler'
+import { isAddProjectResourceRequest, isCloneProjectRequest, isCreateProjectRequest, isCreateWorkspaceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteProjectResourceRequest, isDeleteWorkspaceRequest, isDuplicateProjectFileRequest, isGetDataBlobRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetProjectResourceRequest, isGetProjectResourcesRequest, isGetProjectsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isNeurosiftRequest, isRenameProjectFileRequest, isRenameProjectResourceRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/NeurosiftRequest'
 
 const ADMIN_USER_IDS = JSON.parse(process.env.ADMIN_USER_IDS || '[]') as string[]
 
@@ -113,6 +118,21 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
         else if (isGetProjectFileRequest(payload)) {
             return await getProjectFileHandler(payload, {verifiedUserId})
+        }
+        else if (isGetProjectResourcesRequest(payload)) {
+            return await getProjectResourcesHandler(payload, {verifiedUserId})
+        }
+        else if (isGetProjectResourceRequest(payload)) {
+            return await getProjectResourceHandler(payload, {verifiedUserId})
+        }
+        else if (isAddProjectResourceRequest(payload)) {
+            return await addProjectResourceHandler(payload, {verifiedUserId})
+        }
+        else if (isDeleteProjectResourceRequest(payload)) {
+            return await deleteProjectResourceHandler(payload, {verifiedUserId})
+        }
+        else if (isRenameProjectResourceRequest(payload)) {
+            return await renameProjectResourceHandler(payload, {verifiedUserId})
         }
         else if (isSetWorkspaceUsersRequest(payload)) {
             return await setWorkspaceUsersHandler(payload, {verifiedUserId})

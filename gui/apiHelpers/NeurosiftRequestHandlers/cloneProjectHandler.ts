@@ -4,7 +4,7 @@ import { getMongoClient } from "../getMongoClient";
 import getWorkspace from "../getWorkspace";
 import getWorkspaceRole from '../getWorkspaceRole';
 import createRandomId from "../createRandomId";
-import { NSDataBlob, NSProject, NSProjectFile } from "../../src/types/neurosift-types";
+import { NSDataBlob, NSProject, NSProjectFile, NSProjectResource } from "../../src/types/neurosift-types";
 import removeIdField from "../removeIdField";
 
 const cloneProjectHandler = async (request: CloneProjectRequest, o: {verifiedUserId?: string}): Promise<CloneProjectResponse> => {
@@ -56,6 +56,15 @@ const cloneProjectHandler = async (request: CloneProjectRequest, o: {verifiedUse
     const dataBlobs = removeIdField(await dataBlobsCollection.find({projectId: request.projectId}).toArray()) as NSDataBlob[]
     await dataBlobsCollection.insertMany(dataBlobs.map(dataBlob => ({
         ...dataBlob,
+        workspaceId: project2.workspaceId,
+        projectId: project2.projectId
+    })))
+
+    // copy the resources
+    const projectResourcesCollection = client.db('neurosift').collection('projectResources')
+    const projectResources = removeIdField(await projectResourcesCollection.find({projectId: request.projectId}).toArray()) as NSProjectResource[]
+    await projectResourcesCollection.insertMany(projectResources.map(projectResource => ({
+        ...projectResource,
         workspaceId: project2.workspaceId,
         projectId: project2.projectId
     })))

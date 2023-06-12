@@ -1,5 +1,7 @@
-import { FunctionComponent } from "react";
-import TextEditor from "./TextEditor";
+import { ViewAgenda } from "@mui/icons-material";
+import { FunctionComponent, useMemo } from "react";
+import { useProject } from "../ProjectPageContext";
+import TextEditor, { ToolbarItem } from "./TextEditor";
 
 type Props = {
     fileName: string
@@ -13,6 +15,7 @@ type Props = {
 }
 
 const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, onSaveContent, editedFileContent, setEditedFileContent, readOnly, width, height}) => {
+    const {openTab} = useProject()
     const language = fileName.endsWith('.json') ? (
         'json'
     ) : fileName.endsWith('.yaml') ? (
@@ -25,9 +28,31 @@ const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, onSave
         'javascript'
     ) : fileName.endsWith('.md') ? (
         'markdown'
-    ) : 'text'
+    ) : fileName.endsWith('.ns') ? (
+        'yaml'
+    ) : (
+        'text'
+    )
 
     const wordWrap = language === 'json' || language === 'markdown'
+
+    const toolbarItems: ToolbarItem[] = useMemo(() => {
+        if (fileName.endsWith('.ns')) {
+            return [
+                {
+                    label: 'view',
+                    icon: <ViewAgenda />,
+                    onClick: () => {
+                        openTab(`view:${fileName}`)
+                    },
+                    tooltip: 'View this Neurosift figure'    
+                }
+            ]
+        }
+        else {
+            return []
+        }
+    }, [fileName, openTab])
 
     return (
         <TextEditor
@@ -40,6 +65,7 @@ const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, onSave
             editedText={editedFileContent}
             onSetEditedText={setEditedFileContent}
             wordWrap={wordWrap}
+            toolbarItems={toolbarItems}
             // onReload=
             readOnly={readOnly}
         />

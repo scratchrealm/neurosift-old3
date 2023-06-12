@@ -1,5 +1,5 @@
 import { GetWorkspacesRequest, GetWorkspacesResponse } from "../../src/types/NeurosiftRequest";
-import { isSPWorkspace, SPWorkspace } from "../../src/types/neurosift-types";
+import { isNSWorkspace, NSWorkspace } from "../../src/types/neurosift-types";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
 
@@ -9,9 +9,9 @@ const getWorkspacesHandler = async (request: GetWorkspacesRequest, o: {verifiedU
     const userId = o.verifiedUserId
     
     const workspaces = removeIdField(await workspacesCollection.find({}).toArray())
-    const workspaces2: SPWorkspace[] = []
+    const workspaces2: NSWorkspace[] = []
     for (const workspace of workspaces) {
-        if (!isSPWorkspace(workspace)) {
+        if (!isNSWorkspace(workspace)) {
             console.warn(workspace)
 
             // // one-off fix

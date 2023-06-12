@@ -78,6 +78,43 @@ export const isNSProjectFile = (x: any): x is NSProjectFile => {
     })
 }
 
+export type NSResourceType =
+        'SpikeTrains' |
+        'Video' |
+        'AudioSpectrogram' |
+        'TimeseriesGraph'
+
+export const isNSResourceType = isOneOf(
+    [
+        'SpikeTrains',
+        'Video',
+        'AudioSpectrogram',
+        'TimeseriesGraph'
+    ].map(x => isEqualTo(x))
+)
+
+export type NSProjectResource = {
+    projectId: string
+    workspaceId: string
+    resourceName: string
+    resourceType: NSResourceType
+    resourceFormat: string
+    uri: string
+    timestampCreated: number
+}
+
+export const isNSProjectResource = (x: any): x is NSProjectResource => {
+    return validateObject(x, {
+        projectId: isString,
+        workspaceId: isString,
+        resourceName: isString,
+        resourceType: isNSResourceType,
+        resourceFormat: isString,
+        uri: isString,
+        timestampCreated: isNumber
+    })
+}
+
 export type NSDataBlob = {
     workspaceId: string
     projectId: string

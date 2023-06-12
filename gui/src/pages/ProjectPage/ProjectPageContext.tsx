@@ -1,7 +1,7 @@
 import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
-import { cloneProject, deleteProject, deleteProjectFile, duplicateProjectFile, fetchProject, fetchProjectFiles, renameProjectFile, setProjectProperty } from '../../dbInterface/dbInterface';
+import { cloneProject, deleteProject, deleteProjectFile, deleteProjectResource, duplicateProjectFile, fetchProject, fetchProjectFiles, fetchProjectResources, renameProjectFile, setProjectProperty } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
-import { NSProject, NSProjectFile } from '../../types/neurosift-types';
+import { NSProject, NSProjectFile, NSProjectResource } from '../../types/neurosift-types';
 
 type Props = {
     projectId: string
@@ -108,6 +108,7 @@ type ProjectPageContextType = {
     workspaceId: string
     project?: NSProject
     projectFiles?: NSProjectFile[]
+    projectResources?: NSProjectResource[]
     openTabs: {
         tabName: string
         content?: string
@@ -121,6 +122,7 @@ type ProjectPageContextType = {
     setTabContent: (tabName: string, content: string | undefined) => void
     setTabEditedContent: (tabName: string, editedContent: string) => void
     refreshFiles: () => void
+    refreshResources: () => void
     deleteProject: () => Promise<void>
     cloneProject: (newWorkspaceId: string) => Promise<string>
     setProjectProperty: (property: 'name', value: any) => void
@@ -128,6 +130,8 @@ type ProjectPageContextType = {
     duplicateFile: (fileName: string, newFileName: string) => void
     renameFile: (fileName: string, newFileName: string) => void
     fileHasBeenEdited: (fileName: string) => boolean
+    deleteResource: (resourceName: string) => void
+    renameResource: (resourceName: string, newResourceName: string) => void
 }
 
 const ProjectPageContext = React.createContext<ProjectPageContextType>({
@@ -142,13 +146,16 @@ const ProjectPageContext = React.createContext<ProjectPageContextType>({
     setTabContent: () => {},
     setTabEditedContent: () => {},
     refreshFiles: () => {},
+    refreshResources: () => {},
     deleteProject: async () => {},
     cloneProject: async () => {return ''},
     setProjectProperty: () => {},
     deleteFile: () => {},
     duplicateFile: () => {},
     renameFile: () => {},
-    fileHasBeenEdited: () => false
+    fileHasBeenEdited: () => false,
+    deleteResource: () => {},
+    renameResource: () => {}
 })
 
 export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({children, projectId}) => {
@@ -156,6 +163,10 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
     const [projectFiles, setProjectFiles] = React.useState<NSProjectFile[] | undefined>()
     const [refreshFilesCode, setRefreshFilesCode] = React.useState(0)
     const refreshFiles = useCallback(() => setRefreshFilesCode(rfc => rfc + 1), [])
+
+    const [projectResources, setProjectResources] = React.useState<NSProjectResource[] | undefined>()
+    const [refreshResourcesCode, setRefreshResourcesCode] = React.useState(0)
+    const refreshResources = useCallback(() => setRefreshResourcesCode(rrc => rrc + 1), [])
 
     const [refreshProjectCode, setRefreshProjectCode] = React.useState(0)
     const refreshProject = useCallback(() => setRefreshProjectCode(rac => rac + 1), [])
@@ -182,6 +193,15 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
             setProjectFiles(af)
         })()
     }, [refreshFilesCode, projectId, auth])
+
+    useEffect(() => {
+        (async () => {
+            setProjectResources(undefined)
+            if (!projectId) return
+            const ar = await fetchProjectResources(projectId, auth)
+            setProjectResources(ar)
+        })()
+    }, [refreshResourcesCode, projectId, auth])
 
     const deleteProjectHandler = useMemo(() => (async () => {
         if (!project) return
@@ -218,6 +238,18 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         openTabsDispatch({type: 'closeTab', tabName: `file:${fileName}`})
     }, [project, projectId, refreshFiles, auth])
 
+    const deleteResource = useCallback(async (resourceName: string) => {
+        if (!project) return
+        await deleteProjectResource(project.workspaceId, projectId, resourceName, auth)
+        refreshResources()
+    }, [project, projectId, refreshResources, auth])
+
+    const renameResource = useCallback(async (resourceName: string, newResourceName: string) => {
+        if (!project) return
+        await renameProjectFile(project.workspaceId, projectId, resourceName, newResourceName, auth)
+        refreshResources()
+    }, [project, projectId, refreshResources, auth])
+
     const fileHasBeenEdited = useMemo(() => ((fileName: string) => {
         const tab = openTabs.openTabs.find(x => x.tabName === `file:${fileName}`)
         if (!tab) return false
@@ -238,14 +270,17 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         setTabContent: (tabName: string, content: string | undefined) => openTabsDispatch({type: 'setTabContent', tabName, content}),
         setTabEditedContent: (tabName: string, editedContent: string) => openTabsDispatch({type: 'setTabEditedContent', tabName, editedContent}),
         refreshFiles,
+        refreshResources,
         deleteProject: deleteProjectHandler,
         cloneProject: cloneProjectHandler,
         setProjectProperty: setProjectPropertyHandler,
         deleteFile,
         duplicateFile,
         renameFile,
-        fileHasBeenEdited
-    }), [project, projectFiles, projectId, refreshFiles, openTabs, deleteProjectHandler, cloneProjectHandler, setProjectPropertyHandler, deleteFile, duplicateFile, renameFile, fileHasBeenEdited])
+        fileHasBeenEdited,
+        deleteResource,
+        renameResource
+    }), [project, projectFiles, projectId, refreshFiles, openTabs, deleteProjectHandler, cloneProjectHandler, setProjectPropertyHandler, deleteFile, duplicateFile, renameFile, fileHasBeenEdited, refreshResources, deleteResource, renameResource])
 
     return (
         <ProjectPageContext.Provider value={value}>

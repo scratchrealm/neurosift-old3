@@ -1,4 +1,4 @@
-import { isNSProject, isNSProjectFile, isNSWorkspace, NSProject, NSProjectFile, NSWorkspace } from "./neurosift-types"
+import { isNSProject, isNSProjectFile, isNSProjectResource, isNSWorkspace, NSProject, NSProjectFile, NSProjectResource, NSResourceType, NSWorkspace } from "./neurosift-types"
 import validateObject, { isArrayOf, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
 
 // getWorkspaces
@@ -443,6 +443,162 @@ export const isGetProjectFileResponse = (x: any): x is GetProjectFileResponse =>
     })
 }
 
+// getProjectResources
+
+export type GetProjectResourcesRequest = {
+    type: 'getProjectResources'
+    timestamp: number
+    projectId: string
+}
+
+export const isGetProjectResourcesRequest = (x: any): x is GetProjectResourcesRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getProjectResources'),
+        timestamp: isNumber,
+        projectId: isString
+    })
+}
+
+export type GetProjectResourcesResponse = {
+    type: 'getProjectResources'
+    projectResources: NSProjectResource[]
+}
+
+export const isGetProjectResourcesResponse = (x: any): x is GetProjectResourcesResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getProjectResources'),
+        projectResources: isArrayOf(isNSProjectResource)
+    })
+}
+
+// getProjectResource
+
+export type GetProjectResourceRequest = {
+    type: 'getProjectResource'
+    timestamp: number
+    projectId: string
+    resourceName: string
+}
+
+export const isGetProjectResourceRequest = (x: any): x is GetProjectResourceRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getProjectResource'),
+        timestamp: isNumber,
+        projectId: isString,
+        resourceName: isString
+    })
+}
+
+export type GetProjectResourceResponse = {
+    type: 'getProjectResource'
+    projectResource: NSProjectResource
+}
+
+export const isGetProjectResourceResponse = (x: any): x is GetProjectResourceResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getProjectResource'),
+        projectResource: isNSProjectResource
+    })
+}
+
+// addProjectResource
+
+export type AddProjectResourceRequest = {
+    type: 'addProjectResource'
+    timestamp: number
+    projectId: string
+    workspaceId: string
+    resourceName: string
+    resourceType: NSResourceType
+    resourceFormat: string
+    uri: string
+}
+
+export const isAddProjectResourceRequest = (x: any): x is AddProjectResourceRequest => {
+    return validateObject(x, {
+        type: isEqualTo('addProjectResource'),
+        timestamp: isNumber,
+        projectId: isString,
+        workspaceId: isString,
+        resourceName: isString,
+        resourceType: isOneOf([isEqualTo('file'), isEqualTo('uri')]),
+        resourceFormat: isString,
+        uri: isString
+    })
+}
+
+export type AddProjectResourceResponse = {
+    type: 'addProjectResource'
+}
+
+export const isAddProjectResourceResponse = (x: any): x is AddProjectResourceResponse => {
+    return validateObject(x, {
+        type: isEqualTo('addProjectResource')
+    })
+}
+
+// deleteProjectResource
+
+export type DeleteProjectResourceRequest = {
+    type: 'deleteProjectResource'
+    timestamp: number
+    projectId: string
+    workspaceId: string
+    resourceName: string
+}
+
+export const isDeleteProjectResourceRequest = (x: any): x is DeleteProjectResourceRequest => {
+    return validateObject(x, {
+        type: isEqualTo('deleteProjectResource'),
+        timestamp: isNumber,
+        projectId: isString,
+        workspaceId: isString,
+        resourceName: isString
+    })
+}
+
+export type DeleteProjectResourceResponse = {
+    type: 'deleteProjectResource'
+}
+
+export const isDeleteProjectResourceResponse = (x: any): x is DeleteProjectResourceResponse => {
+    return validateObject(x, {
+        type: isEqualTo('deleteProjectResource')
+    })
+}
+
+// renameProjectResource
+
+export type RenameProjectResourceRequest = {
+    type: 'renameProjectResource'
+    timestamp: number
+    projectId: string
+    workspaceId: string
+    resourceName: string
+    newResourceName: string
+}
+
+export const isRenameProjectResourceRequest = (x: any): x is RenameProjectResourceRequest => {
+    return validateObject(x, {
+        type: isEqualTo('renameProjectResource'),
+        timestamp: isNumber,
+        projectId: isString,
+        workspaceId: isString,
+        resourceName: isString,
+        newResourceName: isString
+    })
+}
+
+export type RenameProjectResourceResponse = {
+    type: 'renameProjectResource'
+}
+
+export const isRenameProjectResourceResponse = (x: any): x is RenameProjectResourceResponse => {
+    return validateObject(x, {
+        type: isEqualTo('renameProjectResource')
+    })
+}
+
 // getDataBlob
 
 export type GetDataBlobRequest = {
@@ -583,6 +739,11 @@ export type NeurosiftRequestPayload =
     DuplicateProjectFileRequest |
     RenameProjectFileRequest |
     GetProjectFileRequest |
+    GetProjectResourcesRequest |
+    GetProjectResourceRequest |
+    AddProjectResourceRequest |
+    DeleteProjectResourceRequest |
+    RenameProjectResourceRequest |
     GetDataBlobRequest |
     DeleteProjectRequest |
     CloneProjectRequest |
@@ -605,6 +766,11 @@ export const isNeurosiftRequestPayload = (x: any): x is NeurosiftRequestPayload 
         isDuplicateProjectFileRequest,
         isRenameProjectFileRequest,
         isGetProjectFileRequest,
+        isGetProjectResourcesRequest,
+        isGetProjectResourceRequest,
+        isAddProjectResourceRequest,
+        isDeleteProjectResourceRequest,
+        isRenameProjectResourceRequest,
         isGetDataBlobRequest,
         isDeleteProjectRequest,
         isCloneProjectRequest,
@@ -648,6 +814,11 @@ export type NeurosiftResponse =
     DuplicateProjectFileResponse |
     RenameProjectFileResponse |
     GetProjectFileResponse |
+    GetProjectResourcesResponse |
+    GetProjectResourceResponse |
+    AddProjectResourceResponse |
+    DeleteProjectResourceResponse |
+    RenameProjectResourceResponse |
     GetDataBlobResponse |
     DeleteProjectResponse |
     CloneProjectResponse |
@@ -670,6 +841,11 @@ export const isNeurosiftResponse = (x: any): x is NeurosiftResponse => {
         isDuplicateProjectFileResponse,
         isRenameProjectFileResponse,
         isGetProjectFileResponse,
+        isGetProjectResourcesResponse,
+        isGetProjectResourceResponse,
+        isAddProjectResourceResponse,
+        isDeleteProjectResourceResponse,
+        isRenameProjectResourceResponse,
         isGetDataBlobResponse,
         isDeleteProjectResponse,
         isCloneProjectResponse,

@@ -1,6 +1,6 @@
-import { SPWorkspace } from "../src/types/neurosift-types"
+import { NSWorkspace } from "../src/types/neurosift-types"
 
-const getWorkspaceRole = (workspace: SPWorkspace, userId: string | undefined): 'none' | 'viewer' | 'editor' | 'admin' => {
+const getWorkspaceRole = (workspace: NSWorkspace, userId: string | undefined): 'none' | 'viewer' | 'editor' | 'admin' => {
     if (userId?.startsWith('admin|')) {
         return 'admin'
     }

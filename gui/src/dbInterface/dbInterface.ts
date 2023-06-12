@@ -1,5 +1,5 @@
-import { NSProject, NSProjectFile, NSWorkspace } from "../types/neurosift-types";
-import { CloneProjectRequest, CreateProjectRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteWorkspaceRequest, DuplicateProjectFileRequest, GetDataBlobRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetProjectsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RenameProjectFileRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/NeurosiftRequest";
+import { NSProject, NSProjectFile, NSProjectResource, NSResourceType, NSWorkspace } from "../types/neurosift-types";
+import { AddProjectResourceRequest, CloneProjectRequest, CreateProjectRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteProjectResourceRequest, DeleteWorkspaceRequest, DuplicateProjectFileRequest, GetDataBlobRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetProjectResourceRequest, GetProjectResourcesRequest, GetProjectsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RenameProjectFileRequest, RenameProjectResourceRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/NeurosiftRequest";
 import postNeurosiftRequest from "./postNeurosiftRequest";
 
 export const fetchWorkspaces = async (auth: Auth): Promise<NSWorkspace[]> => {
@@ -222,6 +222,79 @@ export const renameProjectFile = async (workspaceId: string, projectId: string, 
     const resp = await postNeurosiftRequest(req, {...auth})
     if (resp.type !== 'renameProjectFile') {
         throw Error(`Unexpected response type ${resp.type}. Expected renameProjectFile.`)
+    }
+}
+
+export const fetchProjectResources = async (projectId: string, auth: Auth): Promise<NSProjectResource[]> => {
+    const req: GetProjectResourcesRequest = {
+        type: 'getProjectResources',
+        timestamp: Date.now() / 1000,
+        projectId
+    }
+    const resp = await postNeurosiftRequest(req, {...auth})
+    if (resp.type !== 'getProjectResources') {
+        throw Error(`Unexpected response type ${resp.type}. Expected getProjectResources.`)
+    }
+    return resp.projectResources
+}
+
+export const fetchProjectResource = async (projectId: string, resourceName: string, auth: Auth): Promise<NSProjectResource | undefined> => {
+    const req: GetProjectResourceRequest = {
+        type: 'getProjectResource',
+        timestamp: Date.now() / 1000,
+        projectId,
+        resourceName
+    }
+    const resp = await postNeurosiftRequest(req, {...auth})
+    if (resp.type !== 'getProjectResource') {
+        throw Error(`Unexpected response type ${resp.type}. Expected getProjectResource.`)
+    }
+    return resp.projectResource
+}
+
+export const addProjectResource = async (workspaceId: string, projectId: string, resourceName: string, resourceType: NSResourceType, resourceFormat: string, uri: string, auth: Auth): Promise<void> => {
+    const req: AddProjectResourceRequest = {
+        type: 'addProjectResource',
+        timestamp: Date.now() / 1000,
+        projectId,
+        workspaceId,
+        resourceName,
+        resourceType,
+        resourceFormat,
+        uri
+    }
+    const resp = await postNeurosiftRequest(req, {...auth})
+    if (resp.type !== 'addProjectResource') {
+        throw Error(`Unexpected response type ${resp.type}. Expected addProjectResource.`)
+    }
+}
+
+export const deleteProjectResource = async (workspaceId: string, projectId: string, resourceName: string, auth: Auth): Promise<void> => {
+    const req: DeleteProjectResourceRequest = {
+        type: 'deleteProjectResource',
+        timestamp: Date.now() / 1000,
+        projectId,
+        workspaceId,
+        resourceName
+    }
+    const resp = await postNeurosiftRequest(req, {...auth})
+    if (resp.type !== 'deleteProjectResource') {
+        throw Error(`Unexpected response type ${resp.type}. Expected deleteProjectResource.`)
+    }
+}
+
+export const renameProjectResource = async (workspaceId: string, projectId: string, resourceName: string, newResourceName: string, auth: Auth): Promise<void> => {
+    const req: RenameProjectResourceRequest = {
+        type: 'renameProjectResource',
+        timestamp: Date.now() / 1000,
+        projectId,
+        workspaceId,
+        resourceName,
+        newResourceName
+    }
+    const resp = await postNeurosiftRequest(req, {...auth})
+    if (resp.type !== 'renameProjectResource') {
+        throw Error(`Unexpected response type ${resp.type}. Expected renameProjectResource.`)
     }
 }
 

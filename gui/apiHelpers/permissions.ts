@@ -49,6 +49,20 @@ export const userCanDeleteProjectFile = (workspace: NSWorkspace, userId: string 
     return ((workspaceRole === 'admin' || workspaceRole === 'editor'))
 }
 
+export const userCanAddProjectResource = (workspace: NSWorkspace, userId: string | undefined): boolean => {
+    const workspaceRole = getWorkspaceRole(workspace, userId)
+    return ((workspaceRole === 'admin' || workspaceRole === 'editor'))
+}
+
+export const userCanDeleteProjectResource = (workspace: NSWorkspace, userId: string | undefined): boolean => {
+    if (!userId) {
+        // anonymous cannot delete
+        return false
+    }
+    const workspaceRole = getWorkspaceRole(workspace, userId)
+    return ((workspaceRole === 'admin' || workspaceRole === 'editor'))
+}
+
 export const userCanSetWorkspaceProperty = (workspace: NSWorkspace, userId: string | undefined): boolean => {
     const workspaceRole = getWorkspaceRole(workspace, userId)
     return (workspaceRole === 'admin')

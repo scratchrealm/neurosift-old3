@@ -1,5 +1,5 @@
 import { CreateProjectRequest, CreateProjectResponse } from "../../src/types/NeurosiftRequest";
-import { SPProject } from "../../src/types/neurosift-types";
+import { NSProject } from "../../src/types/neurosift-types";
 import createRandomId from "../createRandomId";
 import { getMongoClient } from "../getMongoClient";
 import getWorkspace from "../getWorkspace";
@@ -20,7 +20,7 @@ const createProjectHandler = async (request: CreateProjectRequest, o: {verifiedU
         throw new Error('User does not have permission to create an projects in this workspace')
     }
 
-    const projects: SPProject = {
+    const projects: NSProject = {
         projectId,
         workspaceId,
         name: request.name,

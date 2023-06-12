@@ -42,6 +42,14 @@ const ProjectMainPanel: FunctionComponent<{width: number, height: number}> = ({w
                         width={0}
                         height={0}
                     />
+                // ) : tabName.startsWith('view:') ? (
+                //     <NeurosiftFileViewer
+                //         key={tabName}
+                //         fileName={tabName.slice('view:'.length)}
+                //         width={0}
+                //         height={0}
+                //     />
+                // ) : (
                 ) : (
                     <div key={tabName}>Not implemented</div>
                 )
